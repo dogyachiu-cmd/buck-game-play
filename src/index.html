@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#51bcca">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="用小手探索陸地與海洋。種東西、認識動物、收集金幣！">
+  <title>小小探險家</title>
+  <link rel="icon" href="../assets/ui/app-icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../assets/ui/icon-192.png">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <link rel="stylesheet" href="./game.css">
+  <script type="importmap">
+    {"imports":{"three":"../vendor/three.module.js","three/addons/":"../vendor/"}}
+  </script>
+</head>
+<body>
+  <main id="app" data-screen="home">
+    <div class="world-backdrop" aria-hidden="true"><img class="land-backdrop" src="../assets/backgrounds/land-storybook-v1.png" alt=""><img class="sea-backdrop" src="../assets/backgrounds/sea-storybook-v1.png" alt=""></div>
+    <div id="stage" aria-label="3D 冒險場景"></div>
+    <section id="homeScreen" class="screen home-screen" aria-label="選擇冒險">
+      <div class="home-scenery"></div>
+      <div class="home-content">
+        <div class="home-top"><span class="edition"><span class="dot"></span>我的冒險世界</span><div class="home-tools"><button class="round pale" id="homeShop" aria-label="打開商店"><span data-icon="shop"></span></button><button class="round pale" id="homeJournal" aria-label="冒險紀錄與存檔"><span data-icon="book"></span></button><button class="round pale" id="homeSettings" aria-label="設定"><span data-icon="gear"></span></button></div></div>
+        <header class="title-block"><p class="eyebrow">一起出發，發現好多驚喜！</p><h1>小小<span>探險家</span></h1><span class="title-spark">✦</span></header>
+        <div class="world-cards">
+          <button class="world-card land-card" id="startLand" data-start="land" aria-label="開始陸地冒險">
+            <img class="world-art" src="../assets/concept/concept-02-land.png" alt="" draggable="false">
+            <span class="world-label"><span class="world-symbol" data-icon="tree"></span><span><strong>陸地</strong><span class="activity-icons"><span data-icon="paw"></span><span data-icon="seed"></span></span></span><span class="go" data-icon="play"></span></span>
+          </button>
+          <button class="world-card sea-card" id="startSea" data-start="sea" aria-label="開始海洋冒險">
+            <img class="world-art" src="../assets/concept/concept-01-ocean.png" alt="" draggable="false">
+            <span class="world-label"><span class="world-symbol" data-icon="wave"></span><span><strong>海洋</strong><span class="activity-icons"><span data-icon="fish"></span><span data-icon="net"></span></span></span><span class="go" data-icon="play"></span></span>
+          </button>
+        </div>
+        <div class="home-footer"><span class="save-badge"><span data-icon="coin"></span><b id="homeCoins">0</b></span><span class="home-hint"><span data-icon="hand"></span>點圖片就出發</span><button class="parent-link" id="parentBtn">家長</button></div>
+      </div>
+    </section>
+
+    <section id="gameScreen" class="screen game-screen" hidden aria-label="遊戲操作">
+      <header class="hud">
+        <button class="round" id="homeBtn" aria-label="回到地圖"><span data-icon="home"></span></button>
+        <div class="coin-pill" aria-label="金幣"><span data-icon="coin"></span><b id="coins">0</b></div>
+        <button class="round" id="shopBtn" aria-label="打開商店"><span data-icon="shop"></span></button>
+        <button class="round" id="journalBtn" aria-label="冒險紀錄與存檔"><span data-icon="book"></span></button>
+        <button class="round" id="settingsBtn" aria-label="設定"><span data-icon="gear"></span></button>
+      </header>
+      <div class="place-badge" id="placeBadge"><span data-icon="tree"></span><span id="placeLabel">陸地</span></div>
+      <div class="reward-toast" id="rewardToast" aria-live="polite"></div>
+      <div class="target-bubble" id="targetBubble" hidden></div>
+      <div class="controls-row">
+        <div class="move-control"><div class="joystick" id="joystick" role="group" aria-label="拖曳搖桿移動"><span class="stick-guide north"></span><span class="stick-guide east"></span><span class="stick-guide south"></span><span class="stick-guide west"></span><div class="stick" id="stick"></div></div><span class="control-caption">走一走</span></div>
+        <div class="action-control"><button id="actionBtn" class="action-button" aria-label="靠近後互動" aria-disabled="true"><span id="actionIcon" data-icon="hand"></span></button><span class="control-caption" id="actionLabel">找朋友</span></div>
+      </div>
+      <button class="upgrade-chip" id="upgradeBtn" aria-label="花十枚金幣升級武器"><span data-icon="sword"></span><span id="weaponStars"></span><span class="upgrade-price"><span data-icon="coin"></span>10<span class="up-arrow">↑</span></span></button>
+      <div class="tip" id="tip" hidden><span data-icon="hand"></span><span id="tipText">拖動左邊搖桿</span></div>
+      <div class="saving-notice" id="saveNotice" hidden>這次無法儲存進度</div>
+    </section>
+
+    <div class="loading-screen" id="loadingScreen" hidden role="status"><div class="loading-island"><span data-icon="tree"></span><span data-icon="wave"></span></div><div class="loading-dots"><i></i><i></i><i></i></div><p id="loadMessage">冒險準備中</p><button id="retryBtn" class="primary-button" hidden>再試一次</button><button id="loadBackBtn" class="text-button">回地圖</button></div>
+
+    <dialog id="journalDialog" class="journal-dialog">
+      <div class="dialog-head"><h2><span data-icon="book"></span>我的冒險</h2><button class="round" data-close aria-label="關閉紀錄簿"><span data-icon="close"></span></button></div>
+      <div id="journalRecords"></div>
+      <div class="journal-save"><button id="saveBtn" class="primary-button"><span data-icon="save"></span>存檔</button><p id="journalNotice" role="status">每次冒險都會自動存檔</p></div>
+    </dialog>
+    <dialog id="shopDialog" class="shop-dialog">
+      <div class="dialog-head"><h2><span data-icon="shop"></span>小小商店</h2><button class="round" data-close aria-label="關閉商店"><span data-icon="close"></span></button></div>
+      <div class="shop-wallet"><span data-icon="coin"></span><b id="shopCoins">0</b></div>
+      <div id="shopItems" class="shop-items"></div>
+      <p id="shopNotice" role="status">試玩商品，之後一起決定。</p>
+    </dialog>
+    <dialog id="settingsDialog" class="settings-dialog">
+      <div class="dialog-head"><h2>小背包</h2><button class="round" data-close aria-label="關閉"><span data-icon="close"></span></button></div>
+      <div class="setting-actions"><button id="soundBtn" class="setting-tile" aria-label="切換聲音"><span id="soundIcon" data-icon="speaker"></span><span id="soundLabel">聲音開</span></button><button id="fullscreenBtn" class="setting-tile"><span data-icon="expand"></span><span>大畫面</span></button></div>
+      <button class="primary-button" data-close><span data-icon="play"></span>繼續玩</button>
+    </dialog>
+    <dialog id="parentDialog" class="parent-dialog">
+      <div class="dialog-head"><h2>家長小筆記</h2><button class="round" data-close aria-label="關閉"><span data-icon="close"></span></button></div>
+      <p>左手搖桿移動，靠近目標後按右側圖示。陸地使用木劍或種植工具，海洋使用捕捉網。角色需要靠近才會互動。</p>
+      <p>這是試玩版：陸地動物 +3、海洋生物 +2、收成 +1 金幣；每 10 枚升一級，目前暫試到 4 級。其餘數值與地形仍待孩子決定。</p>
+      <p>進度保存在這個瀏覽器。NAS 同步遊戲檔案，不會自動同步各台裝置的遊戲進度。</p>
+      <p>紀錄簿分別累計打獵、海洋捕捉，以及作物的種植／收成數量。舊版没有記錄種類，舊金幣保留，但明細從新版開始。</p>
+      <p>商店的太陽圈、海洋圈與價格只是今晚試玩的提案，不是孩子已決定的正式商品；買過會記在這台的存檔中。</p>
+      <p id="saveDetails"></p><p id="storageWarning" role="status"></p>
+      <div class="backup-actions"><button id="exportBtn" class="primary-button">備份存檔</button><button id="importBtn" class="primary-button">讀取備份</button></div>
+      <input id="importFile" type="file" accept=".json,application/json" hidden>
+      <p id="backupNotice" role="status"></p>
+      <details id="manualBackup" hidden><summary>沒有下載？複製備份文字</summary><p>可把下列文字複製到記事本，另存為 .json 檔，再用「讀取備份」。</p><textarea id="backupText" aria-label="備份存檔文字" readonly rows="7"></textarea></details>
+      <div id="importConfirm" hidden><p id="importSummary"></p><p>會替換這台的進度，不會合併數量。原進度另留一份本機安全備份。</p><div class="reset-choices"><button id="cancelImport" class="primary-button">先不要</button><button id="confirmImport" class="text-button">確定讀取</button></div></div>
+      <p id="installNote">發布成 HTTPS 網址後，可從手機瀏覽器「加入主畫面」開啟。離線遊玩需先成功載入一次。</p>
+      <p id="cacheStatus"></p>
+      <button id="resetBtn" class="text-button danger">清除這台裝置的進度</button>
+      <div id="resetConfirm" hidden><p>金幣、武器和種植進度都會重新開始。</p><div class="reset-choices"><button id="cancelReset" class="primary-button">保留進度</button><button id="confirmReset" class="text-button danger">確定清除</button></div></div>
+    </dialog>
+    <noscript>請開啟瀏覽器 JavaScript 才能遊玩。</noscript>
+  </main>
+  <script>
+    function loadFailure() { const box=document.getElementById('loadingScreen');box.hidden=false;document.getElementById('loadMessage').textContent='載入中斷，請重新開啟';const retry=document.getElementById('retryBtn');retry.hidden=false;retry.onclick=()=>location.reload(); }
+    window.addEventListener('error',e=>{ if (e.target?.tagName==='SCRIPT') loadFailure(); },true);
+  </script>
+  <script type="module" src="./game.js"></script>
+</body>
+</html>
