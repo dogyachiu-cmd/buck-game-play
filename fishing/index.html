@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#173d40">
+  <meta name="description" content="伸長釣竿，等待魚兒咬鉤。簡單觸控的湖畔釣魚遊戲。">
+  <title>靜湖釣魚</title>
+  <link rel="icon" href="./assets/icon.svg" type="image/svg+xml">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <main id="game" aria-label="靜湖釣魚遊戲">
+    <div class="landscape" aria-hidden="true"></div>
+    <div class="shade" aria-hidden="true"></div>
+    <canvas id="lake" aria-label="湖水裡有游動的魚，釣竿會隨長度調整伸縮"></canvas>
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark" data-icon="hook"></span><div><strong>靜湖釣魚</strong><span class="edition">湖畔時光</span></div></div>
+      <div class="top-actions">
+        <span class="coin-pill" aria-label="金幣"><span data-icon="coin"></span><b id="coins">0</b></span>
+        <button class="icon-button" id="shop-button" aria-label="釣竿商店" data-icon="shop"></button>
+        <button class="icon-button" id="settings-button" aria-label="家長設定與存檔" data-icon="gear"></button>
+      </div>
+    </header>
+    <button class="catch-count" id="journal-button" aria-label="打開魚簍紀錄"><span data-icon="fish"></span><b id="fish-count">0</b><span>魚簍</span></button>
+    <div id="status" class="status" role="status" aria-live="polite">伸長釣竿，試著釣一條魚</div>
+    <div id="catch-result" class="catch-result" hidden aria-live="polite"></div>
+    <div class="controls">
+      <section class="length-control" aria-label="伸縮釣竿">
+        <div class="length-heading"><span id="rod-name">湖畔竿</span><output id="length-value" for="rod-length">1.8</output></div>
+        <div class="length-buttons">
+          <button id="shorten" aria-label="縮短釣竿" data-icon="minus"></button>
+          <input id="rod-length" type="range" min="0.8" max="2.4" step="0.1" value="1.8" aria-label="釣竿長度">
+          <button id="extend" aria-label="伸長釣竿" data-icon="plus"></button>
+        </div>
+        <div class="length-scale" aria-hidden="true"><span>短</span><span>長</span></div>
+      </section>
+      <button id="action" class="action-button" aria-label="拋竿釣魚"><span id="action-icon" data-icon="hook"></span><span id="action-label">釣魚</span></button>
+    </div>
+    <div class="save-line"><span class="save-dot"></span><span id="save-status">自動存檔</span></div>
+    <div id="notice" class="notice" hidden role="status"></div>
+  </main>
+
+  <dialog id="shop-dialog" aria-labelledby="shop-title">
+    <div class="sheet-top"><div><p class="eyebrow">湖畔小舖</p><h1 id="shop-title">挑一支新釣竿</h1></div><button class="close-button" aria-label="關閉商店" data-icon="close"></button></div>
+    <div class="shop-balance"><span data-icon="coin"></span><b id="shop-coins">0</b><span>金幣</span></div>
+    <div id="rod-cards" class="rod-cards"></div>
+    <p id="shop-message" class="sheet-message" role="status"></p>
+  </dialog>
+
+  <dialog id="journal-dialog" aria-labelledby="journal-title">
+    <div class="sheet-top"><div><p class="eyebrow">每一條都記得</p><h1 id="journal-title">我的魚簍</h1></div><button class="close-button" aria-label="關閉魚簍" data-icon="close"></button></div>
+    <div id="fish-records" class="fish-records"></div>
+    <div class="journal-total"><span>累計得到</span><strong><span data-icon="coin"></span><b id="earned">0</b></strong></div>
+    <button id="manual-save" class="solid-button"><span data-icon="save"></span>存檔</button>
+  </dialog>
+
+  <dialog id="settings-dialog" aria-labelledby="settings-title">
+    <div class="sheet-top"><div><p class="eyebrow">靜湖釣魚 · 0.1.0</p><h1 id="settings-title">設定與存檔</h1></div><button class="close-button" aria-label="關閉設定" data-icon="close"></button></div>
+    <div class="settings-actions"><button id="sound-button" class="setting-button"></button><button id="fullscreen-button" class="setting-button"><span data-icon="expand"></span>全螢幕</button></div>
+    <p class="parent-note">成績存在這台裝置。換手機前請備份；釣魚和陸地海洋的存檔各自保存。</p>
+    <p id="storage-message" class="parent-note"></p>
+    <div class="settings-actions"><button id="export-button" class="solid-button">備份存檔</button><label class="outline-button" for="import-file">讀取存檔</label><input id="import-file" type="file" accept="application/json,.json" hidden></div>
+    <details id="backup-details"><summary>備份文字</summary><textarea id="backup-text" aria-label="釣魚備份文字" readonly></textarea><p class="parent-note">若下載沒有出現，可以複製這段文字保存為 .json 檔。</p></details>
+    <div id="import-preview" class="import-preview" hidden><p id="import-description"></p><div class="settings-actions"><button id="import-confirm" class="solid-button">確認讀取</button><button id="import-cancel" class="outline-button">取消</button></div></div>
+    <p id="settings-message" class="sheet-message" role="status"></p>
+    <p id="offline-status" class="parent-note">離線準備中…</p>
+  </dialog>
+  <noscript>請開啟瀏覽器的 JavaScript 才能玩釣魚遊戲。</noscript>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

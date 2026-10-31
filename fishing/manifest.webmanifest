@@ -1,0 +1,12 @@
+{
+  "id": "./",
+  "name": "靜湖釣魚",
+  "short_name": "釣魚",
+  "lang": "zh-Hant",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#173d40",
+  "theme_color": "#173d40",
+  "icons": [{"src":"assets/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any"}]
+}
